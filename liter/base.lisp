@@ -3,7 +3,8 @@
 (uiop:define-package :liter/base
   (:use :cl :iterate)
   (:import-from :serapeum
-                #:define-do-macro)
+                #:define-do-macro
+                #:finc)
   (:export #:get-iterator
            #:make-hash-key-iterator
            #:make-hash-value-iterator
@@ -14,11 +15,6 @@
            #:iterator-list))
 
 (in-package :liter/base)
-
-(defmacro post-incf (place)
-  "Increment PLACE and return the old value"
-  `(prog1 ,place
-     (incf ,place)))
 
 (define-condition iteration-ended (simple-condition) ()
   (:documentation "Condition signaled when an iterator has reached the end."))
@@ -55,7 +51,7 @@ for builtin iterable types.")
     (let ((i 0))
       (lambda ()
         (if (< i (length s))
-            (values (elt s (post-incf i)) t)
+            (values (elt s (finc i)) t)
             (end-iteration)))))
 
   (:method ((a array))
@@ -64,7 +60,7 @@ for builtin iterable types.")
           (len (array-total-size a)))
       (lambda ()
         (if (< i len)
-            (values (row-major-aref a (post-incf i)) t)
+            (values (row-major-aref a (finc i)) t)
             (end-iteration)))))
 
   (:method ((h hash-table))
