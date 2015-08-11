@@ -2,9 +2,10 @@
 ;;;; Copyright (c) 2015 Thayne McCombs <astrothayne@gmail.com>
 
 (uiop:define-package :garten/tools
-    (:use :cl :garten/grower)
-  (:import-from :alexandria :with-gensyms)
-  (:export #:with-grower))
+    (:use :cl :garten/grower :iterate)
+  (:import-from :alexandria #:with-gensyms)
+  (:export #:with-grower
+           #:growing #:feeding))
 
 (in-package :garten/tools)
 
@@ -21,3 +22,24 @@ WITH-GROWER returns the result (fruit) of the grower."
                 (feed ,grower ,item)))
          ,@body)
        (fruit ,grower))))
+
+(defmacro-clause (GROWING type FROM expr &optional INTO var WITH grower-args)
+  "Iterate clause similar to COLLECT but can grow any growable structure.
+
+TYPE is the type of growable to create. If TYPE is a symbol it doesn't need to be quoted.
+
+If provided, GROWER-ARGS should be a plist of arguments to pass to MAKE-GROWER
+after the TYPE parameter.
+
+Note that VAR will contain the grower object, not the end result. If you store
+the grower in a variable it is up to you to call FRUIT on the grower when needed.
+
+EXPR is the actual expression to store in the grower."
+  (let ((grower (or var iterate::*result-var*)))
+    (when (symbolp type)
+      (setf type (list 'quote type)))
+    `(progn
+       (with ,grower = (make-grower ,type ,@grower-args))
+       (feed ,grower ,expr))))
+
+(defsynonym feeding growing)
