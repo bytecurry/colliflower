@@ -1,2 +1,2 @@
 # colliflower
-Generic interfaces for lisp collections.
+Colliflower is a set of generic interfaces for lisp collections.

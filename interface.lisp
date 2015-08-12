@@ -6,5 +6,5 @@
     (:nicknames :colliflower :cf)
   (:documentation "Combination of the LITER, SILO, and GARTEN packages.")
   (:use-reexport :liter
-                 ;:silo
+                 :silo
                  :garten))
