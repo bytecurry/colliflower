@@ -13,7 +13,7 @@
 
 (in-package :garten/grower)
 
-(defgeneric make-grower (type &key &allow-other-keys)
+(defgeneric make-grower (type &key)
   (:documentation "Make a grower object that can be used to \"grow\"
 a collection. The returned object must define the FEED method and in most
 cases should define the FRUIT method and RESET-GROWER methods.

@@ -12,17 +12,17 @@
 
 (in-package :silo/protocol)
 
-(defgeneric sget (object key &key &allow-other-keys)
+(defgeneric sget (object key &key)
   (:documentation "Generic get function. Provides a uniform way to
 access properties of an object. The s stands for super, simple, or standard"))
 
-(defgeneric (setf sget) (value object key &key &allow-other-keys)
+(defgeneric (setf sget) (value object key &key)
   (:documentation "Generic set function. companion to sget.
 SSET should mutate OBJECT.
 Note that for some data types (ex lists, objects) this can't be used to set new values.
 You may be able to use SUPDATE in those cases."))
 
-(defgeneric supdate (object key value &key &allow-other-keys)
+(defgeneric supdate (object key value &key)
   (:documentation "Generic update function. Unlike (SETF SGET) it may or may not mutate
 OBJECT. Data structures should define one or both of (SETF SGET) and SUPDATE.
 
@@ -31,12 +31,12 @@ SUPDATE MUST return the updated object.
 For immutable data structures, SUPDATE can be used to create updated data structures.
 It also works for prepending to lists such as plists or alists.")
 
-  (:method (object key value &rest key-args &key &allow-other-keys)
+  (:method (object key value &rest key-args &key)
     "Default implementation just calls SSET and returns OBJECT."
     (apply #'(setf sget) object key key-args)
     object))
 
-(defgeneric sdel (object key &key &allow-other-keys)
+(defgeneric sdel (object key &key)
   (:documentation "Generic delete function. Companion to sget and sset.
 
 Like SSET it MUST return the object with changes."))

@@ -69,7 +69,7 @@ of NIL."))
 
 ;;; actually define creating them
 
-(defmethod make-grower ((type (eql 'list)) &key prepend &allow-other-keys)
+(defmethod make-grower ((type (eql 'list)) &key prepend)
   "Create a grower that creates a list.
 By default items are added to the end of the list, and the list is built using a LIST-GROWER.
 
@@ -78,7 +78,7 @@ However, if PREPEND is true, then items are pushed onto the front of the list."
       (make-instance 'prepend-list-grower :init-state nil)
       (make-instance 'list-grower)))
 
-(defmethod make-grower ((type (eql :plist)) &key default &allow-other-keys)
+(defmethod make-grower ((type (eql :plist)) &key default)
   "Create a grower that create a plist. Items should be added as a cons cell
 with the key and value as the car and cdr respectively.
 
