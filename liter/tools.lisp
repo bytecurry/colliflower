@@ -1,11 +1,14 @@
 ;;;; tools.lisp
 
 (uiop:define-package :liter/tools
-  (:use :cl :liter/base :iterate)
+    (:use :cl :liter/base
+          :liter/generate
+          :iterate)
   (:export #:itransform
            #:ifilter
            #:ifold #:iaccumulate
-           #:ichain))
+           #:ichain
+           #:izip #:izip-longest))
 
 (in-package :liter/tools)
 
@@ -63,3 +66,36 @@ iterables passed to it in series."
              (if rest
                  (setf it (get-iterator (pop rest)))
                  (signal c))))))))
+
+(defun izip (&rest iterables)
+  "Zip iterables together.
+
+This returns an iterator that returns a list of the results of getting the next value from each iterable.
+The iterator ends when the shortest of the iterables ends."
+  (let ((iterators (mapcar #'get-iterator iterables)))
+    (lambda ()
+      (mapcar #'funcall iterators))))
+
+(defun izip-longest (missing-value &rest iterables)
+  "Like IZIP but stops on the longest iterable.
+When a shorter iterable ends, it will continually return MISSING-VALUE until
+the whole iterator ends."
+  (let ((count 0)
+        (max (list-length iterables)))
+    (flet ((make-zip-iterator (iterable)
+             (let ((it (get-iterator iterable))
+                   done)
+               (make-iterator
+                (if done
+                    missing-value
+                    (handler-case (funcall it)
+                      (iteration-ended ()
+                        (format *terminal-io* "Ended iterator: ~a" count)
+                        (incf count)
+                        (when (>= count max)
+                          (end-iteration))
+                        (setf done t)
+                        missing-value)))))))
+      (let ((iterators (mapcar #'make-zip-iterator iterables)))
+        (lambda ()
+          (mapcar #'funcall iterators))))))
