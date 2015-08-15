@@ -2,6 +2,8 @@
 
 (uiop:define-package :liter/generate
     (:use :cl :liter/base)
+  (:import-from :serapeum
+                #:finc)
   (:export #:icounter
            #:irepeat
            #:make-iterator
@@ -27,14 +29,24 @@ end-point, but a >= comparison is undesirable because it wouldn't work for a neg
       (prog1 i
         (incf i by)))))
 
-(defun irepeat (v n)
+(defun irepeat (v &optional (n -1))
   (declare (integer n))
-  "Create an iterator that returns the value V N times."
+  "Create an iterator that returns the value V N times.
+If N is negative (the default) iterate forever.
+
+Note that CONSTANTLY is equivalent to IREPEAT with a negative N,
+and in fact there is a compiler macro that compiles IREPEAT as CONSTANTLY
+in that case."
   (let ((i 0))
     (lambda ()
-      (if (< i n)
+      (if (/= (finc i) n)
           v
           (end-iteration)))))
+
+(define-compiler-macro irepeat (&whole form v &optional (n -1))
+  (if (and (numberp n) (minusp n))
+      `(constantly ,v)
+      form))
 
 (defmacro make-iterator (&body body)
   "Create an iterator that executes BODY each time.
