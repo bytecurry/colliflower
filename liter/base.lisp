@@ -23,11 +23,13 @@
 condition isn't handled in some way.")
   (:report "An ITERATION-ENDED signal wasn't handled."))
 
-(declaim (inline end-iteration))
 (defun end-iteration ()
   "Convenience function to return values for an iterator that has reached the end."
-  (signal (make-condition 'iteration-ended))
-  (error (make-condition 'unhandled-iteration-end)))
+  (restart-case (progn
+                  (signal (make-condition 'iteration-ended))
+                  (error (make-condition 'unhandled-iteration-end)))
+    (use-value (value)
+      value)))
 
 (defgeneric get-iterator (iterable)
   (:documentation "Get an iterator for some iterable object. Implementations are provided
