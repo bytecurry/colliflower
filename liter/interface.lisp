@@ -10,4 +10,5 @@ the next value in the iterable, and signals a ITERATION-ENDED condition
 if there are no more values.")
   (:use-reexport :liter/base
                  :liter/generate
-                 :liter/tools))
+                 :liter/tools
+                 #+closer-mop :liter/iter-object))
