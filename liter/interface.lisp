@@ -11,4 +11,4 @@ if there are no more values.")
   (:use-reexport :liter/base
                  :liter/generate
                  :liter/tools
-                 #+closer-mop :liter/iter-object))
+                 :liter/iter-object
