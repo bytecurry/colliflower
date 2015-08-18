@@ -12,3 +12,4 @@ if there are no more values.")
                  :liter/generate
                  :liter/tools
                  :liter/iter-object
+                 :liter/file))
