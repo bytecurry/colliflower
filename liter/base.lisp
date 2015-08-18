@@ -8,6 +8,9 @@
   (:export #:get-iterator
            #:make-hash-key-iterator
            #:make-hash-value-iterator
+           #:make-character-stream-iterator
+           #:make-byte-stream-iterator
+           #:make-line-iterator
            #:iteration-ended #:end-iteration
            #:do-iterator #:do-iterable
            #:inext
@@ -75,7 +78,12 @@ If you know of a better way of doing this, please let me know."
     (let ((key-iterator (make-hash-key-iterator h)))
       (lambda ()
         (let ((key (funcall key-iterator)))
-          (cons key (gethash key h)))))))
+          (cons key (gethash key h))))))
+
+  (:method ((s stream))
+    (etypecase (stream-element-type s)
+      (character (make-character-stream-iterator s))
+      (integer   (make-byte-stream-iterator s)))))
 
 (defun make-hash-key-iterator (h)
   (declare (hash-table h))
@@ -90,6 +98,30 @@ If you know of a better way of doing this, please let me know."
   (let ((vals (loop for v being the hash-values of h
                   collect v)))
     (get-iterator vals)))
+
+(defun make-character-stream-iterator (stream)
+  (declare (stream stream))
+  "Get an iterator for a character input stream"
+  (lambda ()
+    (handler-case (read-char stream)
+      (end-of-file ()
+        (end-iteration)))))
+
+(defun make-byte-stream-iterator (stream)
+  (declare (stream stream))
+  "Get an iterator for a binary input stream."
+  (lambda ()
+    (handler-case (read-byte stream)
+      (end-of-file ()
+        (end-iteration)))))
+
+(defun make-line-iterator (stream)
+  (declare (stream stream))
+  "Get an iterator that iterates over lines in a character stream."
+  (lambda ()
+    (handler-case (read-line stream)
+      (end-of-file ()
+        (end-iteration)))))
 
 (defun inext (iterator &rest args)
   "Return the next value of an iterator and whether or not an actual value was
