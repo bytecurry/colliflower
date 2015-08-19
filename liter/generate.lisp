@@ -22,12 +22,11 @@ the TO parameter. Note that if using a BY parameter it is possible to step over 
 end-point, but a >= comparison is undesirable because it wouldn't work for a negative step."
   (let ((i from))
     (lambda (&optional reset)
-      (when (and stop-p (= i to))
-        (end-iteration))
       (when reset
         (setf i from))
-      (prog1 i
-        (incf i by)))))
+      (when (and stop-p (= i to))
+        (end-iteration))
+      (finc i by))))
 
 (defun irepeat (v &optional (n -1))
   (declare (integer n))
@@ -39,9 +38,10 @@ and in fact there is a compiler macro that compiles IREPEAT as CONSTANTLY
 in that case."
   (let ((i 0))
     (lambda ()
-      (if (/= (finc i) n)
-          v
-          (end-iteration)))))
+      (when (>= i n)
+        (end-iteration))
+      (incf i)
+      v)))
 
 (define-compiler-macro irepeat (&whole form v &optional (n -1))
   (if (and (numberp n) (minusp n))
