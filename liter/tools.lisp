@@ -8,7 +8,8 @@
            #:ifilter
            #:ifold #:iaccumulate
            #:ichain
-           #:izip #:izip-longest))
+           #:izip #:izip-longest
+           #:itee))
 
 (in-package :liter/tools)
 
@@ -99,3 +100,22 @@ the whole iterator ends."
       (let ((iterators (mapcar #'make-zip-iterator iterables)))
         (lambda ()
           (mapcar #'funcall iterators))))))
+
+(defun itee (iterable &optional (n 2))
+  "Split a single iterable into N iterators.
+The iterators are returned as values.
+Note that ITEE depends on the iterator of iterable signaling an END-ITERATION
+if the iterator has ended, even if an END-ITERATION has already been signaled."
+  (let* ((iterator (get-iterator iterable))
+         (current-cell (cons nil nil)))
+    (labels ((ensure-next (cell)
+               (when (endp (cdr cell))
+                 (setf (cdr cell) (cons (funcall iterator) nil))))
+             (tee-iterator ()
+               (let ((current-cell current-cell))
+                 (lambda ()
+                   (ensure-next current-cell)
+                   (setf current-cell (cdr current-cell))
+                   (car current-cell)))))
+      (values-list (loop for i from 1 to n
+                        collect (tee-iterator))))))
