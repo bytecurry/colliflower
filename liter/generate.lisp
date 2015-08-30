@@ -5,7 +5,7 @@
   (:import-from :serapeum
                 #:finc)
   (:export #:icounter
-           #:irepeat
+           #:irepeat #:singleton-iterator
            #:make-iterator
            #:make-state-iterator #:make-state-iterator*
            #:icycle #:icycle*))
@@ -42,6 +42,13 @@ in that case."
         (end-iteration))
       (incf i)
       v)))
+
+(defun singleton-iterator (element)
+  "Create an iterator that returns element on the first iteration, and
+ends on the second.
+
+Equivalent to `(irepeat element 1)`."
+  (irepeat element 1))
 
 (define-compiler-macro irepeat (&whole form v &optional (n -1))
   (if (and (numberp n) (minusp n))
