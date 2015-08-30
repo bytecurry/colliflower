@@ -14,6 +14,9 @@ if there are no more values. It should follow the following rules:
 correctly if called with no arguments.
 * If an iterator has completed, it SHOULD signal an ITERATION-ENDED condition, typically using
   END-ITERATION.
+* Once an iterator signals an ITERATION-ENDED condition, it SHOULD signal an ITERATION-ENDED
+condition on each future call, unless something changes the state of the iterator so that it
+can continue iterating.
 * Client code SHOULD handle any ITERATION-ENDED condition, or use a function or macro that does
 (such as the iterate drivers, DO-ITERATOR, etc).
 * Additional return values may be ignored by the caller of an iterator.

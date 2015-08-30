@@ -9,7 +9,9 @@
            #:ifold #:iaccumulate
            #:ichain
            #:izip #:izip-longest
-           #:itee))
+           #:itee
+           #:itake #:itake-while
+           #:idrop #:idrop-while))
 
 (in-package :liter/tools)
 
@@ -117,5 +119,60 @@ if the iterator has ended, even if an END-ITERATION has already been signaled."
                    (ensure-next current-cell)
                    (setf current-cell (cdr current-cell))
                    (car current-cell)))))
-      (values-list (loop for i from 1 to n
-                        collect (tee-iterator))))))
+      (values-list (iter (repeat n)
+                         (collect (tee-iterator)))))))
+
+(defun itake-while (iterable pred)
+  (declare (function pred))
+  "Return an iterator that returns elements from ITERABLE as long as PRED returns
+true when passed the value. Not that this will consume the first item where PRED
+returns nil and not return it."
+  (let ((it (get-iterator iterable))
+        done)
+    (lambda (&rest args)
+      (when done
+        (end-iteration))
+      (let ((element (apply it args)))
+        (if (funcall pred element)
+            element
+            (progn
+              (setf done t)
+              (end-iteration)))))))
+
+(defun itake (iterable n)
+  (declare (integer n))
+  "Take the first N elements of iterable.
+Returns an iterator."
+  (let ((it (get-iterator iterable))
+        (i 0))
+    (lambda (&rest args)
+      (if (>= i n)
+          (end-iteration)
+          (progn
+            (incf i)
+            (apply it args))))))
+
+(defun idrop (iterable n)
+  (declare (integer n))
+  "Return an iterator over the elements of iterable after
+dropping the first n."
+  (let ((it (get-iterator iterable)))
+    (dotimes (x n)
+      (handler-case (funcall it)
+        (iteration-ended ()
+          (return-from idrop #'end-iteration))))
+    it))
+
+(defun idrop-while (iterable pred)
+  (declare (function pred))
+  "Return an iterator over the elements of iterable that
+drops the initial elements while PRED returns false for them.
+This is the inverse of ITAKE-WHILE."
+  (let ((it (get-iterator iterable))
+        first)
+    (iter (for element = (handler-case (funcall it)
+                           (iteration-ended ()
+                             (return-from idrop-while #'end-iteration))))
+          (while (funcall pred element))
+          (finally (setf first element)))
+    (ichain (singleton-iterator first) it)))
