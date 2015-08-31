@@ -22,7 +22,9 @@
   (:documentation "A class to represent an iterator object.
 
 If closer-mop is enabled, it is a funcallable object that calls ITER-OBJECT-NEXT when called.
-Otherwise GET-ITERATOR returns a function that calls ITER-OBJECT-NEXT"))
+Otherwise GET-ITERATOR returns a function that calls ITER-OBJECT-NEXT.
+
+Subclasses should use a metaclass of FUNCALLABLE-STANDARD-CLASS if mop is available."))
 
 #+closer-mop
 (defmethod initialize-instance :after ((object iter-object) &key &allow-other-keys)

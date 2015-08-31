@@ -28,7 +28,7 @@ An iterable is any object for which there is a method defined for GET-ITERATOR.
 Most liter function accept an iterable, and will get an iterator using GET-ITERATOR.
 There is a GET-ITERATOR method defined for iterators that is equivalent to the identity
 function, so iterators can be passed to these functions.")
-  (:USE-reexport :liter/base
+  (:use-reexport :liter/base
                  :liter/generate
                  :liter/tools
                  :liter/iter-object
