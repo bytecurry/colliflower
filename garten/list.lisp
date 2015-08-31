@@ -49,23 +49,20 @@ the list itself."
 
 ;;; Plist
 
-(defclass plist-grower (list-grower)
+(defclass plist-grower (grower)
   ((default-value :initarg :default :reader plist-grower-default))
   (:documentation "A grower that creates a plist. Items added should be cons cells
 of the key and value. If an item isn't a cons cell it is treated as a key, with a value
-of NIL."))
+of DEFAULT-VALUE."))
 
-(defmethod fruit ((grower plist-grower))
-  (let ((items (call-next-method))
-        (default (plist-grower-default grower)))
-    (iter (for item in items)
-          (if (consp item)
-              (progn
-                (collect (car item))
-                (collect (cdr item)))
-              (progn
-                (collect item)
-                (collect default))))))
+(defun %plist-feed (grower key value)
+  (setf (getf (grower-state grower) key) value))
+
+(defmethod feed ((grower plist-grower) (item cons))
+  (%plist-feed grower (car item) (cdr item)))
+
+(defmethod feed ((grower plist-grower) item)
+  (%plist-feed grower item (plist-grower-default grower)))
 
 ;;; actually define creating them
 

@@ -66,7 +66,9 @@ It also may not be defined for all growers."))
 ;;;; Grower class
 
 (defclass grower ()
-  ((grower-state :initarg :init-state :accessor grower-state))
+  ((grower-state :initarg :init-state
+                 :accessor grower-state
+                 :initform nil))
   (:documentation "Base class for specialized growers.
 
 Note that not all grower's will be subclasses of GROWER."))
