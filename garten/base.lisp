@@ -63,3 +63,6 @@ an initial size, such as a vector.")
 
 (defmethod feed ((grower hash-table) (item cons))
   (setf (gethash (car item) grower) (cdr item)))
+
+(defmethod reset-grower ((grower hash-table))
+  (clrhash grower))
