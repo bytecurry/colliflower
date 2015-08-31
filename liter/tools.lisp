@@ -9,6 +9,7 @@
            #:ifold #:iaccumulate
            #:ichain
            #:izip #:izip-longest
+           #:izip-with-index
            #:itee
            #:itake #:itake-while
            #:idrop #:idrop-while))
@@ -102,6 +103,13 @@ the whole iterator ends."
       (let ((iterators (mapcar #'make-zip-iterator iterables)))
         (lambda ()
           (mapcar #'funcall iterators))))))
+
+(defun izip-with-index (iterable)
+  "Zip an iterable with an index.
+
+Each element of the new iterator is a list of the index (starting with 0) and
+the next element of ITERABLE."
+  (izip (icounter) iterable))
 
 (defun itee (iterable &optional (n 2))
   "Split a single iterable into N iterators.
