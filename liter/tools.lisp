@@ -31,17 +31,16 @@ and returns the value that the new iterator should return."
 PREDICATE is true."
   (let ((iterator (get-iterator iterable)))
     (lambda (&rest args)
-      (loop
-         (let ((item (apply iterator args)))
-           (when (funcall predicate item)
-             item))))))
+      (iter (for item = (apply iterator args))
+            (when (funcall predicate item)
+              (return item))))))
 
 (defun ifold (iterable op &optional initial)
   "Fold over an iterable.
 ITERABLE is the iterable to fold over.
 OP is a binary operation that takes the accumulated result, and an iterated item
 and returns a new accumulated result.
-INITIAL is the initial accumlated state."
+INITIAL is the initial accumulated state."
   (iter (for item in-iterable iterable)
         (reducing item by op initial-value initial)))
 
