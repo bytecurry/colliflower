@@ -6,6 +6,7 @@ Colliflower has four components:
  2. garten
  3. silo
  4. colliflower
+
 Each of these components are described below.
 
 ## liter
@@ -56,3 +57,8 @@ macro, and a `GROWING` directive for the iterate library.
 ## silo
 Silo provides a generic way to access and set values of data structures by a key.
 The key may be a normal key, or an index.
+
+## colliflower
+
+Colliflower is brings the four above components together. The `colliflower` package exports
+all of the public symbols from `liter`, `garten`, and `silo` and provides a few additional tools that combine functionality from the packages.
