@@ -32,7 +32,7 @@ The function is generic so that GROWERs can use more efficient methods if desire
 
   (:method (grower iterable)
     (do-iterable (item iterable)
-      (feed item))))
+      (feed grower item))))
 
 (defgeneric fruit (grower)
   (:documentation "Return the final result of a grower.
