@@ -3,7 +3,7 @@
 
 (uiop:define-package :silo/base
     (:use :cl :silo/protocol)
-  (:export #:idx-key
+  (:export #:plist-key
            #:alist-key))
 
 (in-package :silo/base)
@@ -22,26 +22,27 @@
 (define-sgetter ((object array) subscripts &key)
     (aref object subscripts))
 
-(define-sgetter ((object list) key &key default)
-    (getf object key default)
-  :documentation "default implementation for lists. Assumes a plist")
+(define-sgetter ((object list) (key integer) &key)
+    (nth key object)
+  :documentation "default implementation for lists. Assumes a using an index")
 
-(defmethod supdate ((object list) key value &key)
-  (setf (getf object key) value)
-  object)
-
-;;; For alists and list indices we need a way to specifiy a different
+;;; For alists and plists we need a way to specifiy a different
 ;;; key.
 
-(defclass %idx-ref () ((idx :initarg :idx :type integer)))
-(defun idx-key (idx)
-  (declare (integer idx))
-  "Create a key to access lists by index"
-  (make-instance '%idx-ref :idx idx))
+(defclass %plist-ref ()
+  ((key-item :initarg :key-item)))
+(defun plist-key (key-item)
+  "Create a key to access an item in a plist"
+  (make-instance '%plist-ref :key-item key-item))
 
-(define-sgetter ((object list) (key %idx-ref) &key)
-    (nth (slot-value key 'key) object)
-  :documentation "Get element of list by index")
+(define-sgetter ((object list) (key %plist-ref) &key default)
+    (getf object (slot-value key 'key-item) default)
+  :documentation "Get an element from a plist. Not that although (setf sget) works
+on an existing value, supdate is needed to add a new value and save the result.")
+
+(defmethod supdate ((object list) (key %plist-ref) value &key)
+  (setf (getf object (slot-value key 'key-item)) value)
+  object)
 
 (defclass %alist-ref ()
   ((item :initarg :item)
