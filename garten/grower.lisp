@@ -75,3 +75,6 @@ Note that not all grower's will be subclasses of GROWER."))
 
 (defmethod fruit ((grower grower))
   (grower-state grower))
+
+(defmethod reset-grower ((grower grower))
+  (setf (grower-state grower) nil))

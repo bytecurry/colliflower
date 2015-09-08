@@ -44,9 +44,6 @@ the list itself."
 (defmethod feed ((grower prepend-list-grower) item)
   (push item (grower-state grower)))
 
-(defmethod reset-grower ((grower prepend-list-grower))
-  (setf (grower-state grower) nil))
-
 ;;; Plist
 
 (defclass plist-grower (grower)
@@ -83,9 +80,14 @@ If an item is passed to FEED that isn't a cons, then the output will use the ite
 and the default passed as DEFAULT as the value."
   (make-instance 'plist-grower :default default))
 
+(defmethod make-grower ((type (eql :alist)) &key)
+  "Create a grower for an alist. Items should be added as cons cells.
+This is basically just a shortcut for a list grower with prepend set to true."
+  (make-grower 'list :prepend t))
+
 ;;; Define grow method for list, although using a list builder would be better
 
-(defmethod grow ((grower list) item)
+(defmethod feed ((grower list) item)
   "This is a shorthand for (nconc grower (list item))
 It is defined for consistancy, but using a LIST-GROWER is more efficient for building lists."
   (nconc grower (list item)))
