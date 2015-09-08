@@ -1,0 +1,126 @@
+@begin(section)
+@title(Liter)
+Liter is a collection of tools to work with basic iterators.
+
+An iterator in Liter is just a function (usually a closure) which returns
+the next value in the iterable, and signals a ITERATION-ENDED condition
+if there are no more values. It should follow the following rules:
+
+@begin(list)
+@item(An iterator MAY be called with optional, keyword, or rest arguments, but MUST function
+correctly if called with no arguments.)
+@item(If an iterator has completed, it SHOULD signal an ITERATION-ENDED condition, typically using
+END-ITERATION.)
+@item(Once an iterator signals an ITERATION-ENDED condition, it SHOULD signal an ITERATION-ENDED
+condition on each future call, unless something changes the state of the iterator so that it
+can continue iterating.)
+@item(Client code SHOULD handle any ITERATION-ENDED condition, or use a function or macro that does
+(such as the iterate drivers, DO-ITERATOR, etc).)
+@item(Additional return values may be ignored by the caller of an iterator.)
+@item(By convention, key-value pairs SHOULD be represented as a cons pair. (as in alists))
+@item(An iterator MAY be infinite, but not all liter functions can be safely used with such
+iterators. Functions such as ITAKE can be used to convert an infinite iterator to a finite one.)
+@end(list)
+
+An iterable is any object for which there is a method defined for GET-ITERATOR.
+Most liter function accept an iterable, and will get an iterator using GET-ITERATOR.
+There is a GET-ITERATOR method defined for iterators that is equivalent to the identity
+function, so iterators can be passed to these functions.
+
+@begin(section)
+@title(Basic Functionality)
+
+@cl:with-package[name="liter/base"](
+@cl:doc(generic get-iterator)
+@cl:doc(function end-iteration)
+@cl:doc(function inext)
+@cl:doc(condition iteration-ended)
+
+@cl:doc(method get-iterator (f function))
+@cl:doc(method get-iterator (l list))
+@cl:doc(method get-iterator (s vector))
+@cl:doc(method get-iterator (a array))
+@cl:doc(method get-iterator (h hash-table))
+@cl:doc(method get-iterator (s stream))
+@cl:doc(function make-hash-key-iterator)
+@cl:doc(function make-hash-value-iterator)
+@cl:doc(function make-character-stream-iterator)
+@cl:doc(function make-byte-stream-iterator)
+@cl:doc(function make-line-iterator)
+
+@cl:doc(macro do-iterator)
+@cl:doc(macro do-iterable)
+@cl:doc(function iterator-list)
+)
+
+Liter also provides two @link[uri=https://common-lisp.net/project/iterate/](iterate) drivers:
+
+@begin(deflist)
+@term(@c(FOR var IN-ITERATOR it))
+@def(Iterates through the items in an iterator @c(it))
+@term(@c(FOR var IN-ITERABLE it))
+@def(A more generic driver clause that will iterate over anything with @c(get-iterator) defined on it.)
+@end(deflist)
+
+@end(section)
+
+@begin(section)
+@title(Generators)
+The Following API is provided by the @c(liter/generate) package (inluded in the @c(liter)
+package). These functions can be used to create iterators that abstract some sort of sequence.
+
+@cl:with-package[name="liter/generate"](
+@cl:doc(function icounter)
+@cl:doc(function irepeat)
+@cl:doc(function singleton-iterator)
+@cl:doc(function icycle)
+@cl:doc(function icycle*)
+@cl:doc(macro make-iterator)
+@cl:doc(macro make-state-iterator)
+@cl:doc(macro make-state-iterator*)
+)
+@end(section)
+
+@begin(section)
+@title(Tools)
+The following API provides additional tools to perform operations on iterators and iterables.
+
+@cl:with-package[name="liter/tools"](
+@cl:doc(function itransform)
+@cl:doc(function ifilter)
+@cl:doc(function ifold)
+@cl:doc(function iaccumulate)
+@cl:doc(function ichain)
+@cl:doc(function izip)
+@cl:doc(function izip-longest)
+@cl:doc(function izip-with-index)
+@cl:doc(function itee)
+@cl:doc(function itake)
+@cl:doc(function itake-while)
+@cl:doc(function idrop)
+@cl:doc(function idrop-while)
+)
+
+@end(section)
+
+@begin(section)
+@title(ITER-OBJECT)
+@cl:with-package[name="liter/iter-object"](
+@cl:doc(class iter-object)
+@cl:doc(generic iter-object-next)
+@cl:doc(generic iter-object-prev)
+@cl:doc(generic iter-object-end-p)
+)
+@end(section)
+
+@begin(section)
+@title(File iterator)
+
+@cl:with-package[name="liter/file"](
+@cl:doc(class file-iterator)
+@cl:doc(function make-file-iterator)
+@cl:doc(macro with-file-iterator)
+)
+@end(section)
+
+@end(section)

@@ -68,12 +68,15 @@ It also may not be defined for all growers."))
 (defclass grower ()
   ((grower-state :initarg :init-state
                  :accessor grower-state
-                 :initform nil))
+                 :initform nil
+                 :documentation "The state of the grower. By default this is
+what is returned by FRUIT."))
   (:documentation "Base class for specialized growers.
 
 Note that not all grower's will be subclasses of GROWER."))
 
 (defmethod fruit ((grower grower))
+  "Default method for fruit for a GROWER. Just returns GROWER-STATE."
   (grower-state grower))
 
 (defmethod reset-grower ((grower grower))

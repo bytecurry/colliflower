@@ -1,0 +1,68 @@
+@begin(section)
+@title(Silo)
+
+Silo is a library that makes accessing values by keys more generic.
+
+@begin(section)
+@title(Protocol)
+
+@cl:with-package[name="silo/protocol"](
+@cl:doc(generic sget)
+@cl:doc(generic supdate)
+@cl:doc(generic sdel)
+@cl:doc(macro ssetf)
+@cl:doc(macro slocation)
+@cl:doc(macro define-sgetter)
+@cl:doc(macro rget)
+@cl:doc(function rget-apply)
+)
+
+@end(section)
+
+@begin(section)
+@title(Implementations)
+
+The following types have silo operations defined for them:
+
+@begin(deflist)
+@term(standard-object)
+@def(sget and company on a standard object get and set a slot of the object.)
+@term(hash-table)
+@def(sget is equivalent to gethash for hash-tables, and sdel is equivalent to remhash.)
+@term(array)
+@def(sget is equivalent to aref for arrays (including vectors))
+@term(list)
+@def(Lists are more complicated because there are multiple ways to use keys. By default silo
+assumes you want to access by the index in the list. However, you can also acces them as plists
+or alists, as described belos.
+described below access it as a plist and an alist. In general, if there are multiple ways to
+access a an object with keys, the recommended way is to use multiple dispatch on both the
+object referenced and the key, and create a special object for the key.)
+@end(deflist)
+
+@begin(section)
+@title(alists and plists)
+
+Since alists and plists are just lists with different semantics for the same underlying
+representation we needed a way to specify what type of list a list is. They way we do that
+is with special key objects for plists and alists (the default behavior for a list is to
+use the key as an index into the sequence).
+
+One important thing to not is that for both plists and alists, while you can call @c((setf sget))
+in place to update a value already in the mapping, to add a new one you must use @c(supdate) or
+its companion @c((setf slocation)), since the old list won't have a reference to the added key and
+value.
+
+The special keys to access plists and alists are described below. Using a special object like this
+is the recommended way to deal with objects where there are multiple ways to access a key value.
+
+@cl:with-package[name="silo/base"](
+@cl:doc(function plist-key)
+@cl:doc(function alist-key)
+)
+
+@end(section)
+
+@end(section)
+
+@end(section)

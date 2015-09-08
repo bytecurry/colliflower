@@ -14,7 +14,10 @@
 
 (defgeneric sget (object key &key)
   (:documentation "Generic get function. Provides a uniform way to
-access properties of an object. The s stands for super, simple, or standard"))
+access properties of an object. The s stands for super, simple, or standard.
+
+It is setfable as long as @c((setf sget)) is defined as well, which it should be
+for mutable objects."))
 
 (defgeneric (setf sget) (value object key &key)
   (:documentation "Generic set function. companion to sget.
@@ -62,8 +65,8 @@ don't mutate PLACE directly (such as prepending to a list)."
               `(sget ,getter ,@args)))))
 
 (defmacro define-sgetter ((&whole lambda-list obj-spec key &rest params) place-expr &key declarations documentation)
-  (declare (ignore key params))
   "Define SGET and (SETF SGET) for a place to use sget with."
+  (declare (ignore key params))
   (let ((value (gensym))
         (obj (if (atom obj-spec)
                  obj-spec

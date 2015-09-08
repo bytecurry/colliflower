@@ -13,13 +13,13 @@
 (in-package :liter/generate)
 
 (defun icounter (&key (from 0) (by 1) (to 0 stop-p))
-  (declare (number from by to))
   "Create an iterator that just counts up from FROM by amount BY forever.
 The returned iterator takes an optional argument which resets the counter if true.
 
 If a TO parameter is provided, then the counter will stop when the value returned would equal
 the TO parameter. Note that if using a BY parameter it is possible to step over the TO
 end-point, but a >= comparison is undesirable because it wouldn't work for a negative step."
+  (declare (number from by to))
   (let ((i from))
     (lambda (&optional reset)
       (when reset
@@ -29,13 +29,13 @@ end-point, but a >= comparison is undesirable because it wouldn't work for a neg
       (finc i by))))
 
 (defun irepeat (v &optional (n -1))
-  (declare (integer n))
   "Create an iterator that returns the value V N times.
 If N is negative (the default) iterate forever.
 
 Note that CONSTANTLY is equivalent to IREPEAT with a negative N,
 and in fact there is a compiler macro that compiles IREPEAT as CONSTANTLY
 in that case."
+  (declare (integer n))
   (let ((i 0))
     (lambda ()
       (when (>= i n)

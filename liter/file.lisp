@@ -11,11 +11,17 @@
 (in-package :liter/file)
 
 (defclass file-iterator (iter-object)
-  ((stream :initarg :file-stream  :accessor file-iterator-stream :type file-stream)
-   (by-line :initarg :by-line :initform nil)
-   (read-fun :reader file-iterator-reader :type function))
+  ((stream :initarg :file-stream  :accessor file-iterator-stream :type file-stream
+           :documentation "The stream that the file-iterator is backed by.")
+   (by-line :initarg :by-line :initform nil
+            :documentation "Whether or not we are reading by lines. Only applies
+to character streams.")
+   (read-fun :reader file-iterator-reader :type function
+             :documentation "The function to use to read from the stream."))
   #+closer-mop
-  (:metaclass closer-mop:funcallable-standard-class))
+  (:metaclass closer-mop:funcallable-standard-class)
+  (:documentation "An iterator object that represents the iteration state of
+iterating over a file stream."))
 
 (defun %update-read-fun (obj)
   (declare (file-iterator obj))
@@ -30,6 +36,7 @@
   (%update-read-fun obj))
 
 (defmethod (setf file-iterator-stream) :after (v (obj file-iterator))
+  "Set the file stream for the iterator."
   (%update-read-fun obj))
 
 (defmethod iter-object-next ((obj file-iterator) &rest args)

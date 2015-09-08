@@ -16,7 +16,9 @@
 
 ;;; List growers
 (defclass list-grower (grower)
-  ((grower-state :initform (queue)))
+  ((grower-state :initform (queue)
+                 :documentation "A queue of items added. This makes insertion at the end
+a constant time operation."))
   (:documentation "A grower for a list that allows appending elements in constant time."))
 
 (defmethod feed ((grower list-grower) item)
@@ -47,7 +49,9 @@ the list itself."
 ;;; Plist
 
 (defclass plist-grower (grower)
-  ((default-value :initarg :default :reader plist-grower-default))
+  ((default-value :initarg :default :reader plist-grower-default
+                  :documentation "The default value to store in the plist if the fed item isn't
+a cons cell."))
   (:documentation "A grower that creates a plist. Items added should be cons cells
 of the key and value. If an item isn't a cons cell it is treated as a key, with a value
 of DEFAULT-VALUE."))

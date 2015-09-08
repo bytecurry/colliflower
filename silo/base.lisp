@@ -49,8 +49,8 @@ on an existing value, supdate is needed to add a new value and save the result."
    (key :initarg :key :type (or function symbol))
    (test :initarg :test :initform 'eql :type (or function symbol))))
 (defun alist-key (item &key key (test 'eql))
-  (declare (type (or function symbol) test key))
   "Create a key to access values in alists with sget"
+  (declare (type (or function symbol) test key))
   (make-instance '%alist-ref :item item :key key :test test))
 
 (define-sgetter ((object list) (key %alist-ref) &key)

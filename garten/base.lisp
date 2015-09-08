@@ -22,6 +22,11 @@ an initial size, such as a vector.")
 
 (defmethod make-grower ((type (eql 'vector)) &key (size *default-grower-size*)
                                                (element-type t) (adjustable t))
+  "Create a growable vector. @cl:param(size) is the initial size of the vector to grow,
+@cl:param(element-type) is the element-type of the vector. And if @cl:param(adjustable)
+is false, then the vector cannot be grown beyond SIZE.
+
+The resulting vector will have a fill pointer."
   (make-array size :element-type element-type :adjustable adjustable :fill-pointer 0))
 
 (defmethod feed ((grower vector) item)
@@ -33,6 +38,8 @@ an initial size, such as a vector.")
 ;;; Strings and streams
 
 (defmethod make-grower ((type (eql 'string)) &key (element-type 'character))
+  "Create a grower for a string. @cl:param(element-type) is the element type
+of the resulting string."
   (make-string-output-stream :element-type element-type))
 
 (defmethod feed ((grower stream) (item string))
@@ -59,6 +66,8 @@ an initial size, such as a vector.")
 ;;; Hash tables
 
 (defmethod make-grower ((type (eql 'hash-table)) &rest args &key)
+  "Create a grower for a hash-table. Any additional arguments will be passed
+through to MAKE-HASH-TABLE."
   (apply 'make-hash-table args))
 
 (defmethod feed ((grower hash-table) (item cons))

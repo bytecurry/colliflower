@@ -47,12 +47,14 @@ for builtin iterable types.")
     #'end-iteration)
 
   (:method ((l list))
+    "Iterator for the items of a list, or pairs of an alist."
     (lambda ()
       (if l
           (pop l)
           (end-iteration))))
 
   (:method ((s vector))
+    "Iterate over the items of a vector respecting the fill-counter if extant."
     (let ((i 0))
       (lambda ()
         (if (< i (length s))
@@ -81,43 +83,45 @@ If you know of a better way of doing this, please let me know."
           (cons key (gethash key h))))))
 
   (:method ((s stream))
+    "Iterate over the elements of a stream. I.e. the characters of a character
+stream or the bytes of a byte stream."
     (etypecase (stream-element-type s)
       (character (make-character-stream-iterator s))
       (integer   (make-byte-stream-iterator s)))))
 
 (defun make-hash-key-iterator (h)
-  (declare (hash-table h))
   "Get an iterator over the keys of H."
+  (declare (hash-table h))
   (let ((keys (loop for key being the hash-keys of h
                   collect key)))
     (get-iterator keys)))
 
 (defun make-hash-value-iterator (h)
-  (declare (hash-table h))
   "Get an iterator over the values of H."
+  (declare (hash-table h))
   (let ((vals (loop for v being the hash-values of h
                   collect v)))
     (get-iterator vals)))
 
 (defun make-character-stream-iterator (stream)
-  (declare (stream stream))
   "Get an iterator for a character input stream"
+  (declare (stream stream))
   (lambda ()
     (handler-case (read-char stream)
       (end-of-file ()
         (end-iteration)))))
 
 (defun make-byte-stream-iterator (stream)
-  (declare (stream stream))
   "Get an iterator for a binary input stream."
+  (declare (stream stream))
   (lambda ()
     (handler-case (read-byte stream)
       (end-of-file ()
         (end-iteration)))))
 
 (defun make-line-iterator (stream)
-  (declare (stream stream))
   "Get an iterator that iterates over lines in a character stream."
+  (declare (stream stream))
   (lambda ()
     (handler-case (read-line stream)
       (end-of-file ()
@@ -149,6 +153,7 @@ item in ITERATOR."
      ,@body))
 
 (defmacro-driver (FOR var IN-ITERATOR it)
+  "Iterate over all items in an iterator."
   (let ((iterator (gensym))
         (kwd (if generate 'generate 'for)))
     `(progn
@@ -157,6 +162,7 @@ item in ITERATOR."
                          (iteration-ended () (terminate)))))))
 
 (defmacro-driver (FOR var IN-ITERABLE it)
+  "Iterate over all items in an iterable."
   (let ((kwd (if generate 'generate 'for)))
     `(progn
        (,kwd ,var in-iterator (get-iterator ,it)))))

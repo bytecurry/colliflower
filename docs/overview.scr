@@ -1,0 +1,16 @@
+@begin(section)
+@title(Overview)
+
+Colliflower is a collection of libraries for generically working with data structures.
+
+@begin(section)
+@title(Additional functionality)
+In addition to the core in liter, garten, and silo. The Colliflower package provides the
+following functions:
+
+@cl:with-package[name="colliflower/ext"](
+@cl:doc(function grow-from-iterable)
+)
+@end(section)
+
+@end(section)

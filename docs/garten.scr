@@ -1,0 +1,96 @@
+@begin(section)
+@title(Garten)
+
+Garten is a library that provides a generic interface for building collections. It was inspired
+by things like the Growable trait in scala or the StringBuilder class from Java.
+
+@begin(section)
+@title(Growers)
+
+A @i(grower) is an object which can be fed items to grow a data structure, and once all the
+desired items have been added a final result (or @i(fruit)) can be obtained.
+
+@cl:with-package[name="garten/grower"](
+@cl:doc(generic make-grower)
+@cl:doc(generic feed)
+@cl:doc(generic feed-iterable)
+@cl:doc(generic fruit)
+@cl:doc(generic reset-grower)
+@cl:doc(function feed*)
+@cl:doc(class grower)
+@cl:doc(method fruit (grower grower))
+)
+@end(section)
+
+@begin(section)
+@title(Implementations)
+
+Garten provides the following basic built in implementations of the grower interface:
+
+@begin(table)
+@begin(row)
+@cell(@b(type argument)) @cell(@b(result type)) @cell(@b(key args)) @cell(@b(feed argument))
+@cell(@b(backing-type))
+@end(row)
+@begin(row)
+@cell('vector) @cell(vector) @cell(:element-type :size :adjustable) @cell(element)
+@cell(vector)
+@end(row)
+@begin(row)
+@cell('string) @cell(string) @cell(:element-type) @cell(character) @cell(string-stream)
+@end(row)
+@begin(row)
+@cell('hash-table) @cell(hash-table) @cell(same as for make-hashtable) @cell(cons cell)
+@cell(hash-table)
+@end(row)
+@begin(row)
+@cell('list) @cell(list) @cell(:prepend) @cell(element) @cell(list-grower or prepend-list-grower)
+@end(row)
+@begin(row)
+@cell(:plist) @cell(list (plist)) @cell(:default) @cell(cons cell) @cell(plist-grower)
+@end(row)
+@begin(row)
+@cell(:alist) @cell(list (alist)) @cell() @cell(cons cell) @cell(prepend-list-grower)
+@end(row)
+@end(table)
+
+@c(reset-grower) is defined for all of the above.
+
+The keyword arguments for make-grower have the following meanings.
+@begin(deflist)
+@term(:element-type)
+@def(The type of the element stored in the collection. For key-value collections it is the type of the value.)
+@term(:size)
+@def(The initial size to allocate for the container. Useful for things like vectors and hash-tables.
+For some data structures it may not be possible to add more items than the amount specified by size.)
+@term(:adjustable)
+@def(Whether or not the underlying container's size can be adjustable. Defaults to true.)
+@term(:prepend)
+@def(Whether or not elements should be prepended to the front of a sequence rather than the end.
+Defaults to false)
+@term(:default)
+@default(For plists, if a non-cons value is supplied, the value is assumed to be a key, and
+default is used as the value. Defaults to nil.)
+@end(deflist)
+
+Note that for key-value mapping structures, the key and value must be supplied as a cons cell
+with the key as the CAR and the value as the CDR.
+
+The @c(feed) and @c(feed-iterable) functions can also be used for any stream with either
+elements of the streams element-type, or sequences of elements of the streams element-type.
+They can also be used on lists, although they are linear operations, since they use nconc.
+
+@begin(section)
+@title(List Classes)
+
+@cl:with-package[name="garten/list"](
+@cl:doc(class list-grower)
+@cl:doc(class plist-grower)
+@cl:doc(class prepend-list-grower)
+)
+@end(section)
+
+@end(section)
+
+
+@end(section)
