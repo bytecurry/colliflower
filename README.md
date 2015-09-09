@@ -1,6 +1,8 @@
 # colliflower
 Colliflower is a set of generic interfaces for lisp collections.
 
+The full documentation can be found [here](http://bytecurry.github.io/colliflower/overview.html).
+
 Colliflower has four components:
  1. liter
  2. garten
