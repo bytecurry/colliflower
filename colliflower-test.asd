@@ -14,4 +14,10 @@
   :components
   ((:module liter
             :pathname "t/liter"
-            :components ((:test-file "base-test")))))
+            :components ((:test-file "base-test")))
+   (:module garten
+            :pathname "t/garten"
+            :components ((:test-file "base-test")
+                         (:test-file "tools-test"))))
+  :perform (test-op :after (op c)
+                    (uiop:symbol-call :prove '#:run c)))
