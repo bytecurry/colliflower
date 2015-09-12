@@ -10,7 +10,7 @@
 (defmacro is-iterator-over (got expected &optional description)
   `(is (iterator-list ,got) ,expected ,description))
 
-(plan nil)
+(plan 10)
 
 (is-error (end-iteration) 'iteration-ended)
 
