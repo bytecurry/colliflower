@@ -85,7 +85,7 @@ If you know of a better way of doing this, please let me know."
   (:method ((s stream))
     "Iterate over the elements of a stream. I.e. the characters of a character
 stream or the bytes of a byte stream."
-    (etypecase (stream-element-type s)
+    (ecase (stream-element-type s)
       (character (make-character-stream-iterator s))
       (integer   (make-byte-stream-iterator s)))))
 
@@ -145,7 +145,7 @@ item in ITERATOR."
        (loop named ,block-name do
             (handler-case (let ((,var (funcall ,it)))
                             ,@body)
-              (iteration-ended () (return-from ,block-name)))))))
+              (iteration-ended () (return-from ,block-name ,return)))))))
 
 (defmacro do-iterable ((var iterable &optional return) &body body)
   "Loop over all items in the iterable ITERABLE, in a manner similar to dolist."
