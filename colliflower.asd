@@ -6,7 +6,7 @@
 
 (defsystem "colliflower"
   :description "Generic interfaces for collections and iterators."
-  :version "0.1.0"
+  :version "0.1.1"
   :author "Thayne McCombs <bytecurry.software@gmail.com>"
   :license "MIT"
   :defsystem-depends-on (:asdf-package-system)

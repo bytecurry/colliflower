@@ -59,13 +59,17 @@ of the resulting string."
 (defmethod fruit ((grower string-stream))
   (get-output-stream-string grower))
 
+(defmethod fruit :after ((grower stream))
+  "If we got the result of a stream, then we should close it."
+  (close grower))
+
 (defmethod reset-grower ((grower string-stream))
   (get-output-stream-string grower))
 
 
 ;;; Hash tables
 
-(defmethod make-grower ((type (eql 'hash-table)) &rest args &key)
+(defmethod make-grower ((type (eql 'hash-table)) &rest args &key &allow-other-keys)
   "Create a grower for a hash-table. Any additional arguments will be passed
 through to MAKE-HASH-TABLE."
   (apply 'make-hash-table args))
