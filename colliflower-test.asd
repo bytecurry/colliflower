@@ -18,6 +18,9 @@
    (:module garten
             :pathname "t/garten"
             :components ((:test-file "base-test")
-                         (:test-file "tools-test"))))
+                         (:test-file "tools-test")))
+   (:module silo
+            :pathname "t/silo"
+            :components ((:test-file "base-test"))))
   :perform (test-op :after (op c)
                     (uiop:symbol-call :prove '#:run c)))
