@@ -43,6 +43,11 @@ in that case."
       (incf i)
       v)))
 
+(define-compiler-macro irepeat (&whole form v &optional (n -1))
+  (if (and (numberp n) (minusp n))
+      `(constantly ,v)
+      form))
+
 (defun singleton-iterator (element)
   "Create an iterator that returns element on the first iteration, and
 ends on the second.
@@ -50,10 +55,38 @@ ends on the second.
 Equivalent to `(irepeat element 1)`."
   (irepeat element 1))
 
-(define-compiler-macro irepeat (&whole form v &optional (n -1))
-  (if (and (numberp n) (minusp n))
-      `(constantly ,v)
-      form))
+(defun icycle* (&rest args)
+  "Create an iterator that cycles through the arguments passed to it."
+  (setf (cdr (last args)) args)         ; Make the args list cyclical
+  (get-iterator args))
+
+(defun icycle (iterable)
+  "Create an iterator that iterates through ITERABLE, and then cycles through
+the values again.
+This stores the results of iterating over ITERABLE."
+  (let ((firstpass t)
+        (head nil)
+        (last nil)
+        (iterator (get-iterator iterable)))
+    (lambda ()
+      (if firstpass
+          (handler-case
+              (let* ((res (funcall iterator))
+                     (cell (cons res nil)))
+                (if (null head)
+                    (setf last
+                          (setf head cell))
+                    (setf last (setf (cdr last) cell)))
+                res)
+            (iteration-ended ()
+              (setf firstpass nil)
+              (setf (cdr last) head)
+              (pop head)))
+          (pop head)))))
+
+(defun ilist (&rest elements)
+  "Iterate over the arguments passed in. Then terminate."
+  (get-iterator elements))
 
 (defmacro make-iterator (&body body)
   "Create an iterator that executes BODY each time.
@@ -80,32 +113,3 @@ This can be used to create simple state machines."
   `(make-state-iterator (lambda ,lambda-list
                           ,@body)
                         ,initial-state))
-
-(defun icycle* (&rest args)
-  "Create an iterator that cycles through the arguments passed to it."
-  (setf (cdr (last args)) args)         ; Make the args list cyclical
-  (get-iterator args))
-
-(defun icycle (iterable)
-  "Create an iterator that iterates through ITERABLE, and then cycles through
-the values again.
-This stores the results of iterating over ITERABLE."
-  (let ((firstpass t)
-        (head nil)
-        (last nil)
-        (iterator (get-iterator iterable)))
-    (lambda ()
-      (if firstpass
-          (handler-case
-              (let* ((res (funcall iterator))
-                     (cell (cons res nil)))
-                (if (null head)
-                    (setf last
-                          (setf head cell))
-                    (setf last (setf (cdr last) cell)))
-                (values-list res))
-            (iteration-ended ()
-              (setf firstpass nil)
-              (setf (cdr last) head)
-              (pop head)))
-          (pop head)))))

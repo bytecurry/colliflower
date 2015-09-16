@@ -19,8 +19,12 @@
   "Delete an object from a hash-table."
   (remhash key object))
 
-(define-sgetter ((object array) subscripts &key)
-    (aref object subscripts))
+
+(define-sgetter ((object vector) (index integer) &key)
+    (aref object index))
+
+(define-sgetter ((object array) (subscripts list) &key)
+    (apply #'aref object subscripts))
 
 (define-sgetter ((object list) (key integer) &key)
     (nth key object)

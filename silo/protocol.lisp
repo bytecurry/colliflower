@@ -36,7 +36,7 @@ It also works for prepending to lists such as plists or alists.")
 
   (:method (object key value &rest key-args &key)
     "Default implementation just calls SSET and returns OBJECT."
-    (apply #'(setf sget) object key key-args)
+    (apply #'(setf sget) value object key key-args)
     object))
 
 (defgeneric sdel (object key &key)
@@ -64,13 +64,9 @@ don't mutate PLACE directly (such as prepending to a list)."
                  ,store)
               `(sget ,getter ,@args)))))
 
-(defmacro define-sgetter ((&whole lambda-list obj-spec key &rest params) place-expr &key declarations documentation)
+(defmacro define-sgetter (lambda-list place-expr &key declarations documentation)
   "Define SGET and (SETF SGET) for a place to use sget with."
-  (declare (ignore key params))
-  (let ((value (gensym))
-        (obj (if (atom obj-spec)
-                 obj-spec
-                 (car obj-spec))))
+  (let ((value (gensym)))
     `(progn (defmethod sget ,lambda-list
               ,declarations
               ,documentation
@@ -78,8 +74,7 @@ don't mutate PLACE directly (such as prepending to a list)."
             (defmethod (setf sget) ,(list* value lambda-list)
               ,declarations
               ,documentation
-              (setf ,place-expr ,value)
-              ,obj))))
+              (setf ,place-expr ,value)))))
 
 (defmacro rget (object &rest keys)
   "Recursive get. Calls sget for each key in turn from left to right.
