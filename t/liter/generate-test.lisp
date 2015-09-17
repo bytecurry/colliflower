@@ -6,7 +6,7 @@
 
 (in-package :liter/generate-test)
 
-(plan nil)
+(plan 8)
 
 
 (subtest "icounter"
@@ -92,3 +92,5 @@
     (is (inext it) '(nil))
     (is (inext it :foo) '(:foo nil))
     (is (inext it 10) '(10 :foo nil))))
+
+(finalize)
