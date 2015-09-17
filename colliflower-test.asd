@@ -15,7 +15,8 @@
   ((:module liter
             :pathname "t/liter"
             :components ((:test-file "base-test")
-                         (:test-file "generate-test")))
+                         (:test-file "generate-test")
+                         (:test-file "tools-test")))
    (:module garten
             :pathname "t/garten"
             :components ((:test-file "base-test")
