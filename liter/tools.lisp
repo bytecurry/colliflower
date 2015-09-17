@@ -93,7 +93,6 @@ the whole iterator ends."
                     missing-value
                     (handler-case (funcall it)
                       (iteration-ended ()
-                        (format *terminal-io* "Ended iterator: ~a" count)
                         (incf count)
                         (when (>= count max)
                           (end-iteration))
