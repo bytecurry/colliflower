@@ -128,6 +128,19 @@ if the iterator has ended, even if an END-ITERATION has already been signaled."
       (values-list (iter (repeat n)
                          (collect (tee-iterator)))))))
 
+(defun itake (iterable n)
+  "Take the first N elements of iterable.
+Returns an iterator."
+  (declare (integer n))
+  (let ((it (get-iterator iterable))
+        (i 0))
+    (lambda (&rest args)
+      (if (>= i n)
+          (end-iteration)
+          (progn
+            (incf i)
+            (apply it args))))))
+
 (defun itake-while (iterable pred)
   "Return an iterator that returns elements from ITERABLE as long as PRED returns
 true when passed the value. Not that this will consume the first item where PRED
@@ -144,19 +157,6 @@ returns nil and not return it."
             (progn
               (setf done t)
               (end-iteration)))))))
-
-(defun itake (iterable n)
-  "Take the first N elements of iterable.
-Returns an iterator."
-  (declare (integer n))
-  (let ((it (get-iterator iterable))
-        (i 0))
-    (lambda (&rest args)
-      (if (>= i n)
-          (end-iteration)
-          (progn
-            (incf i)
-            (apply it args))))))
 
 (defun idrop (iterable n)
   "Return an iterator over the elements of iterable after
