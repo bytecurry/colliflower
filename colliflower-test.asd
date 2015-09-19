@@ -6,7 +6,7 @@
 
 (defsystem "colliflower-test"
   :description "Tests for colliflower"
-  :version "0.1.0"
+  :version "0.2.0"
   :author "Thayne McCombs <bytecurry.software@gmail.com>"
   :license "MIT"
   :defsystem-depends-on (:prove-asdf)
@@ -16,7 +16,10 @@
             :pathname "t/liter"
             :components ((:test-file "base-test")
                          (:test-file "generate-test")
-                         (:test-file "tools-test")))
+                         (:test-file "tools-test")
+                         (:test-file "iter-object-test")
+                         (:test-file "file-test")
+                         (:static-file "test.txt")))
    (:module garten
             :pathname "t/garten"
             :components ((:test-file "base-test")
