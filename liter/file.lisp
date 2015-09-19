@@ -13,31 +13,15 @@
 (defclass file-iterator (iter-object)
   ((stream :initarg :file-stream  :accessor file-iterator-stream :type file-stream
            :documentation "The stream that the file-iterator is backed by.")
-   (by-line :initarg :by-line :initform nil
-            :documentation "Whether or not we are reading by lines. Only applies
-to character streams.")
-   (read-fun :reader file-iterator-reader :type function
-             :documentation "The function to use to read from the stream."))
+   (reader :initarg :reader
+           :accessor file-iterator-reader
+           :type (function (stream) t)
+           :documentation "The function to use to read from the stream. The results of calling
+this function will be the elements of the iterator."))
   #+closer-mop
   (:metaclass closer-mop:funcallable-standard-class)
   (:documentation "An iterator object that represents the iteration state of
 iterating over a file stream."))
-
-(defun %update-read-fun (obj)
-  (declare (file-iterator obj))
-  (setf (slot-value obj 'read-fun)
-        (ecase (stream-element-type (file-iterator-stream obj))
-          (character (if (slot-value obj 'by-line)
-                         #'read-line
-                         #'read-char))
-          (integer   #'read-byte))))
-
-(defmethod initialize-instance :after ((obj file-iterator) &key &allow-other-keys)
-  (%update-read-fun obj))
-
-(defmethod (setf file-iterator-stream) :after (v (obj file-iterator))
-  "Set the file stream for the iterator."
-  (%update-read-fun obj))
 
 (defmethod iter-object-next ((obj file-iterator) &rest args)
   (declare (ignorable args))
@@ -52,34 +36,50 @@ iterating over a file stream."))
   (not (open-stream-p (file-iterator-stream obj))))
 
 (defun make-file-iterator (filename &key
-                                      by-line
+                                      reader
                                       (element-type 'character)
                                       (if-does-not-exist :error)
                                       (external-format :default))
   "Create a FILE-ITERATOR using the same arguments as OPEN. In fact this is basically like OPEN, but
 returns a FILE-ITERATOR instead of a stream.
 
-If BY-LINE is true, and the ELEMENT-TYPE is a subtype of CHARACTER, then the iterator will return
-whole lines at a time instead of individual characters."
+If a reader function is supplied, then that function is used to read elements from the file. So for example,
+#'read-line can be used for the iterator to return lines at a time. The reader function takes an input stream
+as an argument.
+
+By default READ-CHAR is used for a character stream and READ-BYTE is used for binary streams."
+  (declare (type (or null (function (stream))) reader))
+  (unless reader
+    (setf reader (%get-read-function element-type)))
   (make-instance 'file-iterator
                  :file-stream (open filename
                                     :element-type element-type
                                     :if-does-not-exist if-does-not-exist
                                     :external-format external-format)
-                 :by-line by-line))
+                 :reader reader))
 
 (defmacro with-file-iterator ((var filename &key
-                                   by-line
+                                   reader
                                    (element-type (quote 'character))
                                    (if-does-not-exist :error)
                                    (external-format :default)) &body body)
-  "Macro similar to WITH-OPEN-FILE, but VAR is bound to a file iterator instead of a STREAM."
-  (let ((stream (gensym)))
+  "Macro similar to WITH-OPEN-FILE, but VAR is bound to a file iterator instead of a STREAM.
+The result is guaranteed to be an actual iterator, even if closer-mop isn't enabled."
+  (let ((reader-form (if reader
+                         reader
+                         `(%get-read-function ,element-type)))
+        (stream (gensym)))
     `(with-open-file ,(list stream filename
                             :element-type element-type
                             :if-does-not-exist if-does-not-exist
                             :external-format external-format)
-       (let ((,var (make-instance 'file-iterator
-                                  :file-stream ,stream
-                                  :by-line ,by-line)))
+       (let ((,var (get-iterator
+                    (make-instance 'file-iterator
+                                   :file-stream ,stream
+                                   :reader ,reader-form))))
          ,@body))))
+
+(defun %get-read-function (element-type)
+  (if (subtypep element-type 'character)
+      #'read-char
+      #'read-byte))
