@@ -9,7 +9,8 @@
            #:ssetf
            #:define-sgetter
            #:slocation
-           #:rget #:rget-apply))
+           #:rget #:rget-apply
+           #:contains-p))
 
 (in-package :silo/protocol)
 
@@ -93,3 +94,8 @@ to use."
         (current object))
     (dolist (key keys current)
       (setf current (sget current key)))))
+
+(defgeneric contains-p (container element)
+  (:documentation "Test if a container contains an element or key.
+The exact semantics of whether or not a container contains an
+element depend on the container."))

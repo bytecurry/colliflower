@@ -12,12 +12,18 @@
     (slot-value object key)
   :documentation "Access a slot on a standard-object.")
 
+(defmethod contains-p ((object standard-object) key)
+  (slot-boundp object key))
+
 (define-sgetter ((object hash-table) key &key default)
     (gethash key object default))
 
 (defmethod sdel ((object hash-table) key &key)
   "Delete an object from a hash-table."
   (remhash key object))
+
+(defmethod contains-p ((table hash-table) key)
+  (nth-value 1 (gethash key table)))
 
 
 (define-sgetter ((object vector) (index integer) &key)
@@ -26,9 +32,16 @@
 (define-sgetter ((object array) (subscripts list) &key)
     (apply #'aref object subscripts))
 
+(defmethod contains-p ((container vector) element)
+  (and (position element container) t))
+
+
 (define-sgetter ((object list) (key integer) &key)
     (nth key object)
   :documentation "default implementation for lists. Assumes a using an index")
+
+(defmethod contains-p ((container list) element)
+  (and (member element container) t))
 
 ;;; For alists and plists we need a way to specifiy a different
 ;;; key.
@@ -47,6 +60,9 @@ on an existing value, supdate is needed to add a new value and save the result."
 (defmethod supdate ((object list) (key %plist-ref) value &key)
   (setf (getf object (slot-value key 'key-item)) value)
   object)
+
+(defmethod contains-p ((plist list) (key %plist-ref))
+  (nth-value 0 (get-properties plist (list (slot-value key 'key-item)))))
 
 (defclass %alist-ref ()
   ((item :initarg :item)
@@ -79,3 +95,8 @@ to the front of the list if the associated key isn't already in the list."
           (setf (cdr cell) value)
           object)
         (cons (cons key-item value) object))))
+
+(defmethod contains-p ((alist list) (key %alist-ref))
+  (not (null (assoc (slot-value key 'item) alist
+                    :key (slot-value key 'key)
+                    :test (slot-value key 'test)))))
