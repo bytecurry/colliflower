@@ -4,7 +4,7 @@
 
 (defsystem "silo"
   :description "Generic getters and setters for data structures."
-  :version "0.1.0"
+  :version "0.1.1"
   :author "Thayne McCombs <bytecurry.software@gmail.com"
   :license "MIT"
   :class :package-inferred-system
