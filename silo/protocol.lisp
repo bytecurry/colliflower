@@ -1,3 +1,4 @@
+
 ;;; protocol.lisp
 ;;; Copyright (c) 2015 Thayne McCombs <astrothayne@gmail.com>
 
@@ -62,7 +63,7 @@ don't mutate PLACE directly (such as prepending to a list)."
               `(let ((,stemp (supdate ,getter ,keytemp ,store ,@args)))
                  ,setter
                  ,store)
-              `(sget ,getter ,@args)))))
+              `(sget ,getter ,keytemp ,@args)))))
 
 (defmacro define-sgetter (lambda-list place-expr &key declarations documentation)
   "Define SGET and (SETF SGET) for a place to use sget with."
