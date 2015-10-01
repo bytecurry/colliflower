@@ -3,7 +3,6 @@
 
 (defpackage liter/iter-object-test
   (:use :cl :prove :liter)
-  #+closer-mop
   (:import-from :closer-mop
                 #:funcallable-standard-class))
 
@@ -13,7 +12,6 @@
 
 (defclass test-iterator (iter-object)
   ((val :initform 0 :accessor test-iterator-value))
-  #+closer-mop
   (:metaclass funcallable-standard-class))
 
 (defmethod iter-object-next ((obj test-iterator) &rest args)
@@ -27,7 +25,6 @@
 (defmethod iter-object-end-p ((obj test-iterator))
   nil)
 
-#+closer-mop
 (subtest "funcall test-iterator"
   (diag "with closer-mop enabled")
   (let ((it (make-instance 'test-iterator)))

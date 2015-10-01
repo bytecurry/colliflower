@@ -4,7 +4,6 @@
 (uiop:define-package :liter/iter-object
     (:nicknames :liter-object)
   (:use :cl)
-  #+closer-mop
   (:import-from :closer-mop
                 #:funcallable-standard-class
                 #:set-funcallable-instance-function)
@@ -17,23 +16,16 @@
 
 (defclass iter-object ()
   ()
-  #+closer-mop
   (:metaclass funcallable-standard-class)
   (:documentation "A class to represent an iterator object.
 
-If closer-mop is enabled, it is a funcallable object that calls ITER-OBJECT-NEXT when called.
-Otherwise GET-ITERATOR returns a function that calls ITER-OBJECT-NEXT.
+It is a funcallable object that calls ITER-OBJECT-NEXT when called.
 
-Subclasses should use a metaclass of FUNCALLABLE-STANDARD-CLASS if mop is available."))
+Subclasses should use a metaclass of CLOSER-MOP:FUNCALLABLE-STANDARD-CLASS."))
 
-#+closer-mop
 (defmethod initialize-instance :after ((object iter-object) &key &allow-other-keys)
   (set-funcallable-instance-function object (lambda (&rest args)
                                               (apply #'iter-object-next object args))))
-#-closer-mop
-(defmethod get-iterator ((object iter-object))
-  (lambda (&rest args)
-    (apply #'iter-object-next object args)))
 
 (defgeneric iter-object-next (iter-object &rest args)
   (:documentation "Get the next object in the iter-object iterator."))

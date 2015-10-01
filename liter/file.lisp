@@ -18,7 +18,6 @@
            :type (function (stream) t)
            :documentation "The function to use to read from the stream. The results of calling
 this function will be the elements of the iterator."))
-  #+closer-mop
   (:metaclass closer-mop:funcallable-standard-class)
   (:documentation "An iterator object that represents the iteration state of
 iterating over a file stream."))
