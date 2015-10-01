@@ -6,6 +6,7 @@
     (:use :cl)
   (:export #:sget
            #:supdate #:sdel
+           #:sremove
            #:ssetf
            #:define-sgetter
            #:slocation
@@ -45,6 +46,15 @@ It also works for prepending to lists such as plists or alists.")
   (:documentation "Generic delete function. Companion to sget and sset.
 
 Like SSET it MUST return the object with changes."))
+
+(defgeneric sremove (object key &key)
+  (:documentation "SREMOVE is to SDEL what SUPDATE is to (SETF SGET):
+It returns a collection with the item for KEY removed which may or may not be
+the same object as OBJECT, and which may or may not mutate OBJECT.")
+
+  (:method (object key &rest key-args &key)
+    (apply #'sdel object key key-args)
+    object))
 
 (define-modify-macro ssetf (key value &rest key-args) supdate
                      "Modify macro that sets a place equal to the result of SUPDATE.")
